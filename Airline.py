@@ -213,19 +213,6 @@ class MaxMatching:
             # print('added edge from {0} to {1}'.format(idx, sink_idx))
         
         return g
-
-        '''n = len(adj_matrix)
-        m = len(adj_matrix[0])
-        matching = [-1] * n
-        busy_right = [False] * m
-        for i in range(n):
-            for j in range(m):
-                if (adj_matrix[i][j] and
-                   matching[i] == -1 and
-                   (not busy_right[j])):
-                        matching[i] = j
-                        busy_right[j] = True
-        return matching'''
     
     def find_matching(_, graph, bipartition):
         # call max flow on graph
@@ -235,10 +222,12 @@ class MaxMatching:
         matches = []
         # iterate over flight vertices
         for vertex in range(l + 1, l + r + 1):
-            for (dest, _) in graph.get_edge_indices(vertex):
+            for (dest, idx) in graph.get_edge_indices(vertex):
                 # check if edge ends inside crews partition
+                # and has capacity
                 # print('got an edge ending at {}'.format(dest))
-                if (1 <= dest <= l):
+                e = graph.edges[idx]
+                if (e.capacity - e.flow > 0) and (1 <= dest <= l):
                     # print('adding it!')
                     matches.append(dest)
                     break

@@ -62,7 +62,7 @@ class TestMaxMatching(unittest.TestCase):
         (flow, g_prime) = Airline.max_flow(g, 0, 8)
         self.assertEqual(flow, 3)
         matching = m.find_matching(g_prime, (4, 3))
-        self.assertEqual(matching, [1, 2, 3])
+        self.assertEqual(matching, [4, 2, 3])
         
     def test_eg_one(self):
         m = Airline.MaxMatching()
@@ -73,7 +73,17 @@ class TestMaxMatching(unittest.TestCase):
         (flow, g_prime) = Airline.max_flow(g, 0, 8)
         self.assertEqual(flow, 2)
         matching = m.find_matching(g_prime, (4, 3))
-        self.assertEqual(matching, [1, 2, -1])
+        self.assertEqual(matching, [4, 2, -1])
+
+    def test_eg_two(self):
+        m = Airline.MaxMatching()
+        test_matrix = [(1, 1),
+                       (1, 0)]
+        g = m.build_graph(test_matrix)
+        (flow, g_prime) = Airline.max_flow(g, 0, 5)
+        self.assertEqual(flow, 2)
+        matching = m.find_matching(g_prime, (2, 2))
+        self.assertEqual(matching, [2, 1])
 
 if __name__ == '__main__':
     unittest.main()
