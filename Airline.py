@@ -38,6 +38,17 @@ class Edge:
 class FlowGraph:
     '''This class implements a bit unusual scheme for storing edges of the graph,
     in order to retrieve the backward edge for a given edge quickly.'''
+    
+    '''Thoughts:
+        API:
+            make_edge
+            make_bipartite_graph
+            find_path
+            add_flow
+        
+        I think I can handle add_flow with (from, to, flow) as params
+        If so, find_path can be simplified nicely
+    '''
 
     def __init__(self, n):
         # List of all - forward and backward - edges
@@ -86,10 +97,11 @@ class FlowGraph:
     
         '''
         # aspirational API
+        # doesn't handle multiple edges
         def add_flow(_, from, to, flow):
             idx = self.graph[from_][to]
-            self.edges[idx] += flow
-            self.edges[idx ^ 1] -= flow
+            self.edges[idx].flow += flow
+            self.edges[idx ^ 1].flow -= flow
         '''
 
 
@@ -149,17 +161,6 @@ def breadth_first_search(graph, from_, to):
     # print('returning empty path')
     return (0, [])
 
-# Maybe I won't need this
-'''
-def read_data():
-    vertex_count, edge_count = map(int, input().split())
-    graph = FlowGraph(vertex_count)
-    for _ in range(edge_count):
-        u, v, capacity = map(int, input().split())
-        graph.add_edge(u - 1, v - 1, capacity)
-    return graph
-'''
-
 
 def max_flow(graph, from_, to):
     '''Returns a tuple: (total flow, modified graph)'''
@@ -216,7 +217,8 @@ class MaxMatching:
     
     def find_matching(_, graph, bipartition):
         # call max flow on graph
-        (_, g_prime) = max_flow(graph, 0, graph.num_vertices())
+        (flow, g_prime) = max_flow(graph, 0, graph.num_vertices())
+        # print('flow of {}'.format(flow))
         (l, r) = bipartition
         # assume that crews are on left, flights on right
         matches = []
@@ -233,7 +235,7 @@ class MaxMatching:
                     break
             else:
                 matches.append(-1)
-        # print('matches: {}'.format(matchesp))
+
         return matches
 
     def solve(self):
@@ -241,7 +243,8 @@ class MaxMatching:
         graph = self.build_graph(adj_matrix)
         n_flights = len(adj_matrix)
         n_crews = len(adj_matrix[0])
-        matching = self.find_matching(graph, (n_crews, n_flights))
+        (_, g_prime) = max_flow(graph, 0, n_crews + n_flights + 1)
+        matching = self.find_matching(g_prime, (n_crews, n_flights))
         self.write_response(matching)
 
 if __name__ == '__main__':
